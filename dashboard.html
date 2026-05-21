@@ -1002,18 +1002,129 @@
             }
         }
 
+        const FALLBACK_LOCATIONS = [
+            { location_id: 1, city_name: "Sana'a", country: "Yemen", latitude: 15.3694, longitude: 44.1910 },
+            { location_id: 2, city_name: "Aden", country: "Yemen", latitude: 12.7794, longitude: 45.0367 },
+            { location_id: 3, city_name: "Taiz", country: "Yemen", latitude: 13.5795, longitude: 44.0209 },
+            { location_id: 4, city_name: "Al Hudaydah", country: "Yemen", latitude: 14.7978, longitude: 42.9545 },
+            { location_id: 5, city_name: "Ibb", country: "Yemen", latitude: 13.9667, longitude: 44.1833 },
+            { location_id: 6, city_name: "Mukalla", country: "Yemen", latitude: 14.5425, longitude: 49.1242 },
+            { location_id: 7, city_name: "Dhamar", country: "Yemen", latitude: 14.5425, longitude: 44.4061 },
+            { location_id: 8, city_name: "Amran", country: "Yemen", latitude: 15.6594, longitude: 43.9328 },
+            { location_id: 9, city_name: "Sa'dah", country: "Yemen", latitude: 16.9402, longitude: 43.7638 },
+            { location_id: 10, city_name: "Ma'rib", country: "Yemen", latitude: 15.4591, longitude: 45.3253 },
+            { location_id: 11, city_name: "Al Mahrah", country: "Yemen", latitude: 16.2167, longitude: 52.1667 }
+        ];
+
+        async function fetchLiveWeather(cities) {
+            if (!cities || cities.length === 0) return { current: [], history: [] };
+            
+            const lats = cities.map(c => c.latitude).join(',');
+            const lons = cities.map(c => c.longitude).join(',');
+            
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,surface_pressure,uv_index,dew_point_2m,visibility,cloud_cover,shortwave_radiation&hourly=temperature_2m&forecast_days=1`;
+            
+            const response = await fetch(url);
+            const omData = await response.json();
+            
+            const results = Array.isArray(omData) ? omData : [omData];
+            
+            const updatedCities = [];
+            const historyData = [];
+            
+            cities.forEach((city, index) => {
+                const om = results[index];
+                if (om && om.current) {
+                    const currentObs = {
+                        ...city,
+                        temperature: om.current.temperature_2m,
+                        humidity: om.current.relative_humidity_2m,
+                        windspeed: om.current.wind_speed_10m,
+                        winddirection: om.current.wind_direction_10m,
+                        pressure: om.current.surface_pressure,
+                        uv_index: om.current.uv_index,
+                        dew_point: om.current.dew_point_2m,
+                        visibility: om.current.visibility,
+                        cloud_cover: om.current.cloud_cover,
+                        solar_rad: om.current.shortwave_radiation,
+                        observation_time: om.current.time
+                    };
+                    updatedCities.push(currentObs);
+                    
+                    if (om.hourly && om.hourly.time && om.hourly.temperature_2m) {
+                        const nowISO = om.current.time;
+                        const currentIndex = om.hourly.time.indexOf(nowISO);
+                        const startIndex = currentIndex >= 6 ? currentIndex - 6 : 0;
+                        const endIndex = currentIndex >= 0 ? currentIndex : 6;
+                        
+                        for (let i = startIndex; i <= endIndex; i++) {
+                            if (om.hourly.time[i]) {
+                                historyData.push({
+                                    city_name: city.city_name,
+                                    temperature: om.hourly.temperature_2m[i],
+                                    observation_time: om.hourly.time[i]
+                                });
+                            }
+                        }
+                    }
+                } else {
+                    updatedCities.push(city);
+                }
+            });
+            
+            return { current: updatedCities, history: historyData };
+        }
+
         let lastData = [];
 
         async function update() {
             try {
-                const res = await fetch('/api/weather');
-                const data = await res.json();
-                lastData = data.current;
+                let cities = [];
+                let historyData = [];
+                let serverTime = new Date().toLocaleTimeString();
+                let fetchSuccess = false;
 
-                document.getElementById('api-error').style.display = 'none';
-                document.getElementById('sync-tag').innerText = 'SECURE LINK ACTIVE // ' + data.server_time;
+                try {
+                    const res = await fetch('/api/weather');
+                    const data = await res.json();
+                    if (data && data.status === 'success' && data.current && data.current.length > 0) {
+                        cities = data.current;
+                        historyData = data.history || [];
+                        serverTime = data.server_time || serverTime;
+                        fetchSuccess = true;
+                    }
+                } catch (backendErr) {
+                    console.warn("Backend fetch failed, using local fallbacks.", backendErr);
+                }
 
-                if (!selectedId && data.current.length > 0) selectedId = data.current[0].location_id;
+                if (cities.length === 0) {
+                    cities = JSON.parse(JSON.stringify(FALLBACK_LOCATIONS));
+                }
+
+                try {
+                    const liveData = await fetchLiveWeather(cities);
+                    if (liveData.current && liveData.current.length > 0) {
+                        cities = liveData.current;
+                        historyData = liveData.history || historyData;
+                        fetchSuccess = true;
+                    }
+                } catch (liveErr) {
+                    console.warn("Open-Meteo live fetch failed, falling back to static database telemetry.", liveErr);
+                }
+
+                lastData = cities;
+
+                if (fetchSuccess) {
+                    document.getElementById('api-error').style.display = 'none';
+                    document.getElementById('sync-tag').innerText = 'SECURE LINK ACTIVE // LIVE MET_TELEMETRY // ' + serverTime;
+                    document.getElementById('sync-tag').style.color = '';
+                } else {
+                    document.getElementById('api-error').style.display = 'block';
+                    document.getElementById('sync-tag').innerText = 'SECURE LINK FAILURE';
+                    document.getElementById('sync-tag').style.color = 'var(--danger)';
+                }
+
+                if (!selectedId && cities.length > 0) selectedId = cities[0].location_id;
 
                 if (!map) {
                     await initMap();
@@ -1036,30 +1147,27 @@
                     });
                 }
 
-                if (windEngine) windEngine.update(data.current);
+                if (windEngine) windEngine.update(cities);
 
-                renderSidebar(data.current);
-                renderStats(data.current);
+                renderSidebar(cities);
+                renderStats(cities);
 
-                // Ensure history is at least partially populated for the visual even if empty on server
-                let historyData = data.history || [];
-                if (historyData.length === 0 && data.current.length > 0 && typeof luxon !== 'undefined') {
-                    // Create a simulated 3-hour history if server returns none
+                if (historyData.length === 0 && cities.length > 0 && typeof luxon !== 'undefined') {
                     historyData = [];
-                    data.current.forEach(c => {
+                    cities.forEach(c => {
                         for (let i = 0; i < 4; i++) {
                             historyData.push({
                                 city_name: c.city_name,
-                                temperature: c.temperature + (Math.random() - 0.5),
+                                temperature: (c.temperature || 25) + (Math.random() - 0.5),
                                 observation_time: luxon.DateTime.now().minus({ minutes: i * 60 }).toISO()
                             });
                         }
                     });
                 }
 
-                if (data.current && data.current.length > 0) {
-                    renderVisuals(data.current, historyData);
-                    updateMarkers(data.current);
+                if (cities && cities.length > 0) {
+                    renderVisuals(cities, historyData);
+                    updateMarkers(cities);
                 }
 
             } catch (e) {
