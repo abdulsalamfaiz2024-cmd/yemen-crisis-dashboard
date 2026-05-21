@@ -2,6 +2,8 @@
 
 A geospatial data monitoring and analytics dashboard developed to compile, model, and display atmospheric, demographic, and humanitarian metrics across 11 key governorates in Yemen.
 
+**Live Demo**: [yemen-crisis-dashboard.vercel.app/health](https://yemen-crisis-dashboard.vercel.app/health)
+
 The system features automated background scripts, a performance-optimized SQLite database, and an interactive frontend dashboard with cartographic overlays.
 
 ---
