@@ -10,8 +10,9 @@ import random
 import math
 from init_db import init_db
 
-# Initialize database on startup
-init_db()
+# Initialize database on startup if not running in Vercel serverless environment
+if os.environ.get('VERCEL') != '1':
+    init_db()
 
 app = Flask(__name__)
 CORS(app)
