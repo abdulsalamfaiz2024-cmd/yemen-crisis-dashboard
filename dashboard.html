@@ -14,6 +14,17 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
+        .humanitarian-overview{border:1px solid var(--panel-border);border-radius:13px;background:var(--panel);padding:15px 18px;margin:4px 0 22px;}
+        .overview-heading{font-weight:800;font-size:12px;letter-spacing:.03em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px}
+        .overview-heading span{font-weight:500;color:var(--text-mud);font-size:11px;}
+        .overview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0;}
+        .overview-grid a{border:1px solid var(--panel-border);border-radius:10px;padding:13px;text-decoration:none;display:flex;flex-direction:column;gap:2px;}
+        .overview-grid b{font-size:25px;font-family:Inter,Arial,sans-serif;color:var(--accent);}
+        .overview-grid span{font-size:12px;color:var(--text-main);}
+        .overview-grid small{font-size:10px;color:var(--text-mud);display:block;margin-top:2px;}
+        .overview-source{display:flex;gap:15px;flex-wrap:wrap;}
+        .overview-source a{font-size:11px;text-decoration:underline;color:var(--accent);}
+        @media(max-width:650px){.overview-grid{grid-template-columns:1fr 1fr}.humanitarian-overview{padding:10px}.overview-grid b{font-size:21px}}
         .leaflet-control-attribution { font: 10px/1.5 Arial,sans-serif; }
         :root {
             /* PREMIUM LIGHT THEME (DEFAULT) */
@@ -582,12 +593,11 @@
 
             <div class="charts-row">
                 <div class="chart-wrap">
-                    <div style="font-size:0.6rem; color:#444; margin-bottom:3px;">ATMOSPHERIC RADAR PROFILING</div>
+                    <div style="font-size:0.6rem; color:#444; margin-bottom:3px;">WEATHER FACTORS // NORMALIZED SCALE</div>
                     <div class="info-icon">!</div>
                     <div class="info-box">
                         <b>Radar Scan</b>
-                        A multi-factor weather analysis. The shape grows as conditions like high heat, strong wind, or
-                        humidity become more intense in the selected city.
+                        An illustrative comparison of five weather variables normalized to a common 0–100 scale. Original units differ; the shape does not represent a physical weather index.
                     </div>
                     <canvas id="radarChart"></canvas>
                 </div>
@@ -602,7 +612,7 @@
                     <canvas id="polarChart"></canvas>
                 </div>
                 <div class="chart-wrap">
-                    <div style="font-size:0.6rem; color:#444; margin-bottom:3px;">REGIONAL CLOUD_DENSITY (OCTANTS)</div>
+                    <div style="font-size:0.6rem; color:#444; margin-bottom:3px;">REGIONAL CLOUD COVER (%)</div>
                     <div class="info-icon">!</div>
                     <div class="info-box">
                         <b>Cloud Coverage</b>
@@ -614,7 +624,7 @@
             </div>
 
             <div class="timeline-box" style="position:relative;">
-                <div style="font-size:0.6rem; color:#444; margin-bottom:3px;">TEMPORAL ENERGY GRADIENT (3H WINDOW)</div>
+                <div style="font-size:0.6rem; color:#444; margin-bottom:3px;">RECENT MODEL TEMPERATURE HISTORY (°C)</div>
                 <div class="info-icon" style="top:8px; right:12px;">!</div>
                 <div class="info-box" style="top:28px; right:8px;">
                     <b>Temperature Trend</b>
@@ -622,6 +632,19 @@
                     main cities.
                 </div>
                 <canvas id="lineChart"></canvas>
+            </div>
+
+            <div class="humanitarian-overview">
+                <div class="overview-heading">YEMEN · 2026 HUMANITARIAN OVERVIEW <span>Published snapshots — not live field counts</span></div>
+                <div class="overview-grid">
+                    <a href="/health"><b>22.3M</b><span>People in need <small>OCHA · 2026 HNRP</small></span></a>
+                    <a href="/economy"><b>18.3M</b><span>Acute food insecurity <small>OCHA · 2026 HNRP</small></span></a>
+                    <a href="/education"><b>4.5M</b><span>Children out of school <small>UNICEF · 2026</small></span></a>
+                </div>
+                <div class="overview-source">
+                    <a href="https://yemen.un.org/sites/default/files/2026-03/Yemen_2026_HNRP_EN_final.pdf" target="_blank" rel="noopener">OCHA 2026 report ↗</a>
+                    <a href="https://www.unicef.org/appeals/yemen" target="_blank" rel="noopener">UNICEF 2026 appeal ↗</a>
+                </div>
             </div>
         </div>
     </div>
