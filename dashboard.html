@@ -1024,7 +1024,7 @@
             const lats = cities.map(c => c.latitude).join(',');
             const lons = cities.map(c => c.longitude).join(',');
             
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,surface_pressure,uv_index,dew_point_2m,visibility,cloud_cover,shortwave_radiation&hourly=temperature_2m&forecast_days=1`;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,surface_pressure,uv_index,dew_point_2m,visibility,cloud_cover,shortwave_radiation&hourly=temperature_2m&forecast_days=1&past_days=1&timezone=Asia%2FAden`;
             
             const response = await fetch(url);
             if (!response.ok) throw new Error('Open-Meteo status: ' + response.status);
@@ -1143,6 +1143,14 @@
                     if (el) el.innerText = '--';
                 });
                 renderSidebar([]);
+                const list = document.getElementById('city-sidebar');
+                if (list) list.textContent = 'Current weather data unavailable';
+                Object.values(instances).forEach(chart => chart.destroy());
+                instances = {};
+                Object.values(markers).forEach(marker => marker.remove());
+                markers = {};
+                if (geoLayer) geoLayer.setStyle({ fillColor: '#94a3b8', fillOpacity: 0.08, weight: 1 });
+                if (windEngine) windEngine.update([]);
                 if (!map) await initMap();
             } finally {
                 updating = false;
@@ -1187,8 +1195,8 @@
             const c = cities.find(x => x.location_id === selectedId) || cities[0];
             if (!c) return;
             document.getElementById('st-temp').innerText = Number.isFinite(c.temperature) ? Math.round(c.temperature) + '°C' : '--';
-            document.getElementById('st-hum').innerText = Math.round(c.humidity || 0) + '%';
-            document.getElementById('st-pres').innerText = Math.round(c.pressure || 0) + ' hPa';
+            document.getElementById('st-hum').innerText = Number.isFinite(c.humidity) ? Math.round(c.humidity) + '%' : '--';
+            document.getElementById('st-pres').innerText = Number.isFinite(c.pressure) ? Math.round(c.pressure) + ' hPa' : '--';
             document.getElementById('st-vis').innerText = Number.isFinite(c.visibility) ? (c.visibility / 1000).toFixed(1) + ' km' : '--';
         }
 
