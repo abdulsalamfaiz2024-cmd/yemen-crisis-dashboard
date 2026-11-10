@@ -2,10 +2,11 @@
 <html lang="en">
 
 <head>
+    <script src="/dashboard_ui.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MACRO_ECONOMICS // STRATEGIC_FINANCE_GRID</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
@@ -418,7 +419,7 @@
 <body>
     <header>
         <div style="display: flex; align-items: center; gap: 15px;">
-            <div style="cursor: pointer; font-size: 1.4rem;" onclick="toggleDrawer()">☰</div>
+            <div style="cursor: pointer; font-size: 1.4rem;" data-drawer-toggle aria-expanded="false" aria-controls="drawer">☰</div>
             <div class="logo">FINANCE_SYNDROME // <span style="color:var(--info)">ECONOMIC_GRID</span></div>
         </div>
         <div style="display: flex; align-items: center; gap: 15px;">
@@ -428,12 +429,12 @@
         </div>
     </header>
 
-    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
-    <div class="drawer" id="drawer">
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <div class="drawer" id="drawer" aria-hidden="true">
         <div class="drawer-header">
             <div style="color:var(--text-main); font-weight:800; letter-spacing:1px; font-size: 0.9rem;">
                 STRATEGIC_DIRECTORY</div>
-            <button id="drawer-close" onclick="toggleDrawer()"
+            <button id="drawer-close"
                 style="background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1.2rem;">✕</button>
         </div>
         <nav class="drawer-nav">
@@ -664,6 +665,7 @@
             })();
 
             window.addEventListener('load', init);
+            // Main controls work independently from economy API and Chart.js availability.
         </script>
 </body>
 

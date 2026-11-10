@@ -2,16 +2,17 @@
 <html lang="en">
 
 <head>
+    <script src="/dashboard_ui.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MET-ANALYTICS COMMAND CENTER // YEMEN</title>
     <!-- STABLE LIBS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/luxon@3.0.1"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script>
     <!-- MAP ENGINE -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
         .leaflet-control-attribution{font-size:10px}
@@ -528,7 +529,7 @@
     <div id="api-error" class="error-banner">OFFLINE: NO CONNECTION TO BACKEND SERVER</div>
     <header>
         <div style="display: flex; align-items: center;">
-            <button class="menu-btn" id="drawer-toggle">☰</button>
+            <button class="menu-btn" id="drawer-toggle" data-drawer-toggle aria-expanded="false" aria-controls="drawer">☰</button>
             <div class="logo">ATMOS-ALPHA // TACTICAL_ISR_GRID v11.0</div>
         </div>
         <div style="display:flex; align-items:center; gap:20px;">
@@ -538,7 +539,7 @@
     </header>
 
     <div class="drawer-overlay" id="drawer-overlay"></div>
-    <div class="drawer" id="drawer">
+    <div class="drawer" id="drawer" aria-hidden="true">
         <div class="drawer-header">
             <div class="drawer-title">COMMAND_MENU</div>
             <button class="close-drawer" id="drawer-close">✕</button>
@@ -896,12 +897,19 @@
         async function initMap() {
             if (map) return;
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (typeof L === 'undefined') {
+                window.dashboardMapFallback?.('map',lastData);
+                return;
+            }
             map = L.map('map', { zoomControl: false, attributionControl: true }).setView([15.5, 48.0], 6);
 
             // Fix CARTO "API KEY REQUIRED" tiles while preserving the original map and shading.
+            let mapTileFailures = 0;
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a target="_blank" rel="noopener noreferrer" href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+            }).on('tileerror', () => {
+                if (++mapTileFailures === 3) window.dashboardMapFallback?.('map',lastData);
             }).addTo(map);
 
             // FETCH TACTICAL SHADING (Governorates)
@@ -1108,7 +1116,11 @@
                         fillOpacity:city?0.6:0.05};
                 });
                 if (windEngine) windEngine.update(cities);
-                renderSidebar(cities); renderStats(cities); renderVisuals(cities,historyData); updateMarkers(cities);
+                renderSidebar(cities);
+                renderStats(cities);
+                renderVisuals(cities,historyData);
+                if (map && typeof L !== 'undefined') updateMarkers(cities);
+                else window.dashboardMapFallback?.('map',cities);
             } catch (err) {
                 console.warn('No current model data: clearing stale visualizations',err);
                 lastData=[];lastHistory=[];
@@ -1140,7 +1152,7 @@
 
         function selectCity(city) {
             selectedId = city.location_id;
-            map.flyTo([city.latitude, city.longitude], 8, { duration: 1.2 });
+            if (map && typeof map.flyTo === 'function') map.flyTo([city.latitude, city.longitude], 8, {duration:1.2});
             renderSidebar(lastData); renderStats(lastData); renderVisuals(lastData,lastHistory);
         }
 
@@ -1324,7 +1336,7 @@
         setInterval(update, 300000); // source refresh every five minutes
         window.onload = () => {
             update();
-            initDrawer();
+            // Drawer control is initialized independently by dashboard_ui.js.
         };
 
         // DRAWER CONTROLS

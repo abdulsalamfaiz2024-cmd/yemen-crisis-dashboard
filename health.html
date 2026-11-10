@@ -2,10 +2,11 @@
 <html lang="en">
 
 <head>
+    <script src="/dashboard_ui.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HEALTH_SECTOR // TACTICAL_ISR_GRID</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             /* PREMIUM LIGHT THEME (DEFAULT) */
@@ -637,7 +638,7 @@
 <body>
     <header>
         <div style="display: flex; align-items: center; gap: 10px;">
-            <button class="menu-btn" id="drawer-toggle" onclick="toggleDrawer()">☰</button>
+            <button class="menu-btn" id="drawer-toggle" data-drawer-toggle aria-expanded="false" aria-controls="drawer">☰</button>
             <div class="logo">HEALTH_SYNDROME // <span style="color:var(--accent)">BIO_SURVEILLANCE_GRID</span></div>
         </div>
         <div style="display: flex; align-items: center; gap: 15px;">
@@ -647,12 +648,12 @@
         </div>
     </header>
 
-    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
-    <div class="drawer" id="drawer">
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <div class="drawer" id="drawer" aria-hidden="true">
         <div class="drawer-header">
             <div style="color:var(--text-main); font-weight:800; letter-spacing:1px; font-size: 0.9rem;">
                 STRATEGIC_DIRECTORY</div>
-            <button id="drawer-close" onclick="toggleDrawer()"
+            <button id="drawer-close"
                 style="background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1.2rem;">✕</button>
         </div>
         <nav class="drawer-nav">
@@ -770,6 +771,7 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
+                    if(typeof Chart==='undefined') throw new Error('Charts are unavailable');
                     const d = result.data;
                     const pop = result.population;
                     const ex = result.extended;
@@ -784,7 +786,8 @@
                     document.getElementById('val-fund').innerText = stats.funding_gap;
 
                     // B. Render Facilities Chart
-                    renderFacilitiesChart(ex.facilities);
+                    try { renderFacilitiesChart(ex.facilities); }
+                    catch(err) { console.warn('Facilities chart error',err); }
 
                     // C. Render Humanitarian Response (Fills empty middle card)
                     renderResponseStatus(ex.hno_response);
@@ -801,7 +804,8 @@
                     }
 
                     // F. Little Chart
-                    renderMiniChart('chart-imm', d.measles_immunization.history, 'Complete vaccination % (OCHA 2026)');
+                    try { renderMiniChart('chart-imm', d.measles_immunization.history, 'Vaccination coverage'); }
+                    catch(err) { console.warn('Vaccination chart error',err); }
 
                     // Start Feed
                     startFeed(ex.reports);
@@ -811,7 +815,9 @@
                     document.getElementById('system-status').style.borderColor = "var(--success)";
                 }
             } catch (e) {
-                console.error(e);
+                console.error('Health dashboard load error',e);
+                const tag=document.getElementById('system-status');
+                if(tag)tag.innerText='DATA UNAVAILABLE';
             }
         }
 

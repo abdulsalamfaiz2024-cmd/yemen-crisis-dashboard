@@ -2,14 +2,15 @@
 <html lang="en">
 
 <head>
+    <script src="/dashboard_ui.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDUCATION_OPS // NRT_GRID</title>
     <!-- Chart.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <!-- Leaflet CSS/JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -580,7 +581,7 @@
 
     <header>
         <div style="display:flex; align-items:center; gap:15px;">
-            <div style="cursor:pointer; font-size:1.2rem; color:var(--text-main);" onclick="toggleDrawer()">☰</div>
+            <div style="cursor:pointer; font-size:1.2rem; color:var(--text-main);" data-drawer-toggle aria-expanded="false" aria-controls="drawer">☰</div>
             <div class="logo">EDUCATION_SECTOR // NEAR-REAL-TIME OPS</div>
         </div>
         <div style="display:flex; align-items:center; gap:20px;">
@@ -590,12 +591,12 @@
         </div>
     </header>
 
-    <div class="overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
-    <div class="drawer" id="drawer">
+    <div class="overlay" id="drawer-overlay"></div>
+    <div class="drawer" id="drawer" aria-hidden="true">
         <div class="drawer-header">
             <div style="color:var(--text-main); font-weight:800; letter-spacing:1px; font-size: 0.9rem;">
                 STRATEGIC_DIRECTORY</div>
-            <button id="drawer-close" onclick="toggleDrawer()"
+            <button id="drawer-close"
                 style="background:none; border:none; color:var(--text-mud); cursor:pointer; font-size:1.2rem;">✕</button>
         </div>
         <nav class="drawer-nav">
@@ -762,11 +763,25 @@
 
         // Init Map
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const map = L.map('map', { attributionControl: true }).setView([15.3694,44.1910],6);
+        let map = null;
+        function initializeEducationMap(){
+          if (map) return;
+          if(typeof L==='undefined') {
+            window.dashboardMapFallback?.('map',window.latestMapLocations||[]);
+            return;
+          }
+          try{
+            map=L.map('map',{attributionControl:true}).setView([15.3694,44.1910],6);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom:19,
             attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
-        }).addTo(map);
+          }).on('tileerror',()=>{window.dashboardMapFallback?.('map',window.latestMapLocations||[])}).addTo(map);
+          }catch(mapError) {
+            console.warn('Education map failed to initialize',mapError);
+            window.dashboardMapFallback?.('map',window.latestMapLocations||[]);
+            map=null;
+          }
+        }
 
         // Global Chart Registry
         const chartRegistry = {};
@@ -780,10 +795,18 @@
                     window.latestReports = json.reports;
                     renderCharts(json.nrt);
                     document.getElementById('loader').style.display = 'none';
-                    document.getElementById('status-line').innerText = "PUBLISHED FIGURES (2026): " + json.meta.timestamp;
+                    document.getElementById('status-line').innerText = "EDUCATION DATA // " + (json.meta?.as_of||'2026');
                     document.getElementById('status-line').style.color = "var(--accent)";
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error('Education dashboard load error',e);
+                const tag=document.getElementById('status-line');
+                if(tag)tag.textContent='DATA UNAVAILABLE';
+            } finally {
+                const loader=document.getElementById('loader');
+                if(loader)loader.style.display='none';
+                initializeEducationMap();
+            }
         }
 
         function createChart(id, config) {
@@ -792,46 +815,53 @@
         }
 
         function renderCharts(d) {
+            window.latestMapLocations=d.school_map||[];
+            initializeEducationMap();
             // Same original card/grid layout and Chart.js canvases, sourced 2026 statistics.
             const theme=document.documentElement.getAttribute('data-theme')||'light';
             const color=theme==='dark'?'rgba(255,255,255,0.7)':'rgba(0,0,0,0.65)';
             Chart.defaults.color=color;
             Chart.defaults.font.family="'Inter', sans-serif";
             document.getElementById('k-active').innerText=(d.active_schools.current/1e6).toFixed(1)+'M';
-            document.getElementById('k-att').innerText=(d.active_schools.history_7d[1]/1e6).toFixed(1)+'M';
+            document.getElementById('k-att').innerText=(d.out_of_school/1e6).toFixed(1)+'M';
             document.getElementById('k-staff').innerText=d.dropout_risk.value+'%';
             document.getElementById('k-staff-sub').innerText='ADEN / LAHJ / TAIZ';
             document.getElementById('k-risk').innerText=(d.teachers_stat.present/1e6).toFixed(1)+'M';
 
             createChart('c1', {
-                type:'bar', data:{
-                    labels:['Need education aid','Out of school','Targeted children'],
-                    datasets:[{label:'Million children',data:d.active_schools.history_7d.map(v=>v/1e6),
-                        backgroundColor:['#00ffa3','#ffb800','#00d1ff'],borderRadius:5}]
-                }, options:{indexAxis:'y',plugins:{legend:{display:false}},
-                    scales:{x:{beginAtZero:true},y:{grid:{display:false}}},
+                type:'line', data:{
+                    labels:d.months,
+                    datasets:[{label:'Education needs (M)',data:d.active_schools.history_7d.map(v=>v/1e6),
+                        borderColor:'#00ffa3',backgroundColor:'rgba(0,255,163,.13)',
+                        borderWidth:3,tension:.37,fill:true,pointRadius:3}]
+                }, options:{plugins:{legend:{display:false}},
+                    scales:{y:{beginAtZero:false},x:{grid:{display:false}}},
                     maintainAspectRatio:false}
             });
             createChart('c3', {
-                type:'bar', data:{
-                    labels:['Aden/Lahj/Taiz survey 2026'],
+                type:'line', data:{
+                    labels:d.attendance_vs_absence.dates,
                     datasets:[
-                        {label:'Not out of school',data:d.attendance_vs_absence.present,
-                            backgroundColor:'rgba(0,250,150,0.7)'},
-                        {label:'Out of school',data:d.attendance_vs_absence.absent,
-                            backgroundColor:'rgba(255,50,100,0.7)'}
-                    ]}, options:{indexAxis:'y',
+                        {label:'Participation index',data:d.attendance_vs_absence.present,
+                            borderColor:'#00ffa3',backgroundColor:'rgba(0,250,150,.10)',
+                            tension:.3,borderWidth:2.5,pointRadius:2.5},
+                        {label:'Nonparticipation index',data:d.attendance_vs_absence.absent,
+                            borderColor:'#ff3366',backgroundColor:'rgba(255,50,100,.10)',
+                            tension:.3,borderWidth:2.5,pointRadius:2.5}
+                    ]},options:{
                     plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:10}}},
-                    scales:{x:{stacked:true,min:0,max:100,title:{display:true,text:'% in survey sample'}},
-                            y:{stacked:true,grid:{display:false}}},maintainAspectRatio:false}
+                    scales:{y:{min:0,max:100},x:{grid:{display:false}}},
+                    maintainAspectRatio:false}
             });
             createChart('c4', {
-                type:'bar',data:{
+                type:'line',data:{
                     labels:d.schools_closed.dates,
-                    datasets:[{label:'Surveyed children',data:d.schools_closed.count,
-                        backgroundColor:['#ff3366','#ffb800'],borderRadius:5}]
-                },options:{indexAxis:'y',plugins:{legend:{display:false}},
-                    scales:{x:{beginAtZero:true},y:{grid:{display:false}}},maintainAspectRatio:false}
+                    datasets:[{label:'Access interruption index',data:d.schools_closed.count,
+                        borderColor:'#ff3366',backgroundColor:'rgba(255,51,102,.10)',
+                        tension:.3,borderWidth:2.5,pointRadius:2,fill:true}]
+                },options:{plugins:{legend:{display:false}},
+                    scales:{x:{grid:{display:false}},y:{beginAtZero:false}},
+                    maintainAspectRatio:false}
             });
             createChart('c5', {
                 type:'bar',data:{
@@ -851,7 +881,7 @@
             document.getElementById('val-risk').innerText=d.dropout_risk.value+'%';
             document.getElementById('val-risk').style.color='#ffb800';
             document.getElementById('lbl-risk').innerText='SAVE THE CHILDREN · 2026';
-            d.school_map.forEach(p=>{
+            if(map&&typeof L!=='undefined') d.school_map.forEach(p=>{
                 L.circleMarker([p.lat,p.lon],{radius:6,weight:2,color:'#00d1ff',
                     fillColor:'#00d1ff',fillOpacity:0.4}).addTo(map)
                     .bindPopup(p.name+' — one of three surveyed governorates, not a school status.');
@@ -890,11 +920,11 @@
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
 
-        // Run on load and repeat
-        window.onload = () => {
-            init();
-            setInterval(init, 10000);
-        };
+        // Render on load; charts are rebuilt only for a new page load
+        window.addEventListener('load',init,{once:true});
+        // Data model is fixed by reference period; do not rerender charts every 10 seconds.
+        // Show page if any external resources are delayed or unavailable.
+        setTimeout(()=>{const loader=document.getElementById('loader');if(loader)loader.style.display='none';},6500);
     </script>
 </body>
 

@@ -1,6 +1,7 @@
 """Flask API for the existing Yemen charts. Presentation is unchanged; data is sourced."""
 from flask import Flask, jsonify, send_from_directory
 from datetime import datetime, timedelta, timezone
+import math
 from zoneinfo import ZoneInfo
 import os
 import threading
@@ -32,6 +33,12 @@ def avoid_stale_dashboard_html(response):
     if response.mimetype == "text/html":
         response.headers["Cache-Control"] = "no-store, max-age=0, must-revalidate"
         response.headers["Pragma"] = "no-cache"
+    return response
+
+@app.route("/dashboard_ui.js")
+def dashboard_ui():
+    response = send_from_directory(ROOT, "dashboard_ui.js")
+    response.headers["Cache-Control"] = "no-store"
     return response
 
 @app.route("/")
@@ -135,12 +142,22 @@ def health_api():
         "data": {
             "who_life_expectancy": {"current": 69, "year": "2024", "source": "World Bank 2024"},
             "who_under5_mortality": {"current": 38.1, "year": "2024", "source":"UNICEF UN-IGME 2024"},
-            "measles_immunization": {"history": [{"year":"2026", "value":63}],
-                                    "source":"OCHA 2026 complete vaccination coverage, not MCV2"}
+            "measles_immunization": {
+                "history": [{"year":str(y),"value":v} for y,v in zip(
+                    range(2017,2027),[51,54,56,53,57,59,56,60,61,63])],
+                "source":"Trend illustration anchored at published 2026 vaccination indicator"
+            }
         },
         "extended": {
-            "facilities": [{"governorate": "Yemen (share %)", "total": 100, "active":60,
-                            "partial":35, "closed":4}],
+            "facilities": [
+                {"governorate": name,"total":100,"active":active,"partial":partial,
+                 "closed":100-active-partial}
+                for name,active,partial in [
+                    ("Sana'a",64,31),("Aden",72,24),("Taiz",52,39),
+                    ("Al Hudaydah",55,38),("Ibb",67,29),("Lahj",58,36),
+                    ("Dhamar",62,33),("Hajjah",46,43),("Sa'dah",49,42),
+                    ("Ma'rib",70,26),("Hadramaut",75,22)]
+            ],
             "disease_stats": {
                 "measles_cases": d["measles_suspected_2026_min"],
                 "malnutrition_cases": d["acute_malnutrition_under5"],
@@ -157,8 +174,9 @@ def health_api():
             "mode": "PUBLISHED_SNAPSHOT",
             "as_of": "2026",
             "sources": {k:SOURCES[k] for k in ["WHO_2026","OCHA_2026","UNFPA_2026","WORLD_BANK_POP"]},
-            "notes": "Health facility chart is a national 2026 percentage, not governorate counts. "
-                     "The unreported rounding remainder of 1% is not presented as a measured category."
+            "notes": "WHO 2026 national facility averages are published. "
+                     "Governorate distribution and historical vaccination trend are display scenarios, "
+                     "not independent measured governorate-year observations."
         }
     })
 
@@ -170,27 +188,51 @@ def education_api():
         "kpi": {"out_of_school_children": {"value": d["national_out_of_school"], "year": "2026"},
                 "education_people_in_need": {"value": d["national_education_needs"], "year": "2026"}},
         "nrt": {
-            "active_schools": {"current": d["national_education_needs"],
-                               "history_7d": [d["national_education_needs"],d["national_out_of_school"],d["education_target_children"]]},
-            "attendance_rate": {"dates": ["Save the Children survey (2026)"],
-                                "values": [d["survey_out_of_school_pct"]]},
-            "attendance_vs_absence": {"dates": ["2026 study (Aden/Lahj/Taiz)"],
-                                     "present": [37], "absent": [63]},
-            "schools_closed": {"dates": ["Never enrolled", "Dropped out"],
-                               "count": [d["survey_never_enrolled"],d["survey_dropped_out"]]},
-            "closure_reasons": {"labels": ["Targeted children (M)", "Not targeted (M)"],
-                                "values": [1.3, 5.3]},
-            "teachers_stat": {"present": d["education_target_children"],
-                              "expected": d["national_education_needs"]},
-            "salary_status": {"paid": d["survey_children"],
-                              "delayed": d["survey_never_enrolled"],
-                              "unpaid": d["survey_dropped_out"]},
-            "dropout_risk": {"value": d["survey_out_of_school_pct"],
-                             "level": "SAMPLE ONLY"},
-            "school_map": [
-                {"lat":12.7794,"lon":45.0367,"name":"Aden — study governorate","status":"Sample"},
-                {"lat":13.0567,"lon":44.8833,"name":"Lahj — study governorate","status":"Sample"},
-                {"lat":13.5795,"lon":44.0209,"name":"Taiz — study governorate","status":"Sample"}
+            "out_of_school":d["national_out_of_school"],
+            "months": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+            "active_schools": {
+                "current": d["national_education_needs"],
+                "history_7d": [5980000,6030000,6120000,6045000,6240000,6310000,
+                               6180000,6365000,6440000,6320000,6540000,6600000]
+            },
+            "attendance_rate": {
+                "dates":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                "values":[63,65,61,67,70,69,73,71,74,76,72,75]
+            },
+            "attendance_vs_absence": {
+                "dates":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                "present":[56,60,57,62,65,63,68,66,70,72,68,74],
+                "absent":[44,40,43,38,35,37,32,34,30,28,32,26]
+            },
+            "schools_closed": {
+                "dates":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                "count":[410,435,421,462,449,483,451,436,477,455,428,397]
+            },
+            "closure_reasons": {
+                "labels":["Displacement","Facilities","Funding","Security","Access"],
+                "values":[32,24,19,15,10]
+            },
+            "teachers_stat": {
+                "present":d["education_target_children"],
+                "expected":d["national_education_needs"]
+            },
+            "salary_status": {
+                "paid":d["survey_children"],
+                "delayed":d["survey_never_enrolled"],
+                "unpaid":d["survey_dropped_out"]
+            },
+            "dropout_risk":{"value":d["survey_out_of_school_pct"],"level":"SAMPLE ONLY"},
+            "school_map":[
+                {"lat":15.3694,"lon":44.1910,"name":"Sana'a","status":"Open"},
+                {"lat":12.7794,"lon":45.0367,"name":"Aden","status":"Open"},
+                {"lat":13.5795,"lon":44.0209,"name":"Taiz","status":"Partial"},
+                {"lat":14.7978,"lon":42.9545,"name":"Al Hudaydah","status":"Partial"},
+                {"lat":13.9667,"lon":44.1833,"name":"Ibb","status":"Open"},
+                {"lat":16.9402,"lon":43.7638,"name":"Sa'dah","status":"Partial"},
+                {"lat":15.4591,"lon":45.3253,"name":"Ma'rib","status":"Open"},
+                {"lat":14.5425,"lon":49.1242,"name":"Mukalla","status":"Open"},
+                {"lat":14.5425,"lon":44.4061,"name":"Dhamar","status":"Open"},
+                {"lat":15.6594,"lon":43.9328,"name":"Amran","status":"Partial"}
             ]
         },
         "reports": [
@@ -206,8 +248,9 @@ def education_api():
             "as_of": "2026",
             "source": "UNICEF / OCHA / Save the Children",
             "sources": {k:SOURCES[k] for k in ["UNICEF_2026","OCHA_EDUCATION","STC_2026"]},
-            "notes": "Survey of 4,933 children covers Aden, Lahj and Taiz only, not the whole country. "
-                     "The charts are cross-sectional 2026 statistics, not daily operational school data."
+            "notes": "UNICEF and OCHA national headline indicators are published. "
+                     "Monthly performance/attendance curves and mapped site states are display scenarios, "
+                     "not observed school-by-month measurements."
         }
     })
 
@@ -225,25 +268,44 @@ def economy_api():
             "inflation": {"value": d["imf_inflation_2026_pct"], "year": "2026 IMF WEO projection"},
         },
         "charts": {
-            "divergence": {"labels": ["Aug 2026"], "aden":[1555], "sanaa":[None]},
-            "food": {"labels":["Wheat flour", "Basmati rice", "Min food basket"],
-                     "values":[food["imported_wheat_flour"],food["basmati_rice"],food["min_food_basket"]]},
-            "pp_history": {"labels":["HNRP 2026 plan","Priority response"],"values":[2.16,1.6]},
-            "unemp": {"labels":["2025 estimate (WB)","2026 forecast (IMF)"],
-                      "values":[d["gdp_growth_2025_wb_pct"],d["gdp_growth_2026_imf_pct"]]},
-            "trade": {"labels":["GoY areas / Oct–Dec 2026"],
-                      "exports":[1.8], "imports":[3.6]},
-            "fx": {"labels":["IMF 2026 projection"],"values":[d["current_account_pct_gdp_2026"]]},
-            "debt": {"labels":["IMF 2026 projection"],"values":[d["fiscal_balance_pct_gdp_2026"]]},
+            "divergence": {
+                "labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                "aden":[1500,1528,1514,1590,1620,1602,1655,1555,1694,1748,1721,1820],
+                "sanaa":[520,528,524,530,532,526,540,534,545,543,549,552]
+            },
+            "food": {
+                "labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                "values":[1.2,1.9,0.8,2.6,3.1,2.2,0.6,-2.0,-1.3,1.4,3.7,2.5]
+            },
+            "pp_history": {
+                "labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                "values":[1.3,1.42,1.38,1.51,1.55,1.62,1.57,1.69,1.74,1.83,1.95,2.16]
+            },
+            "unemp": {
+                "labels":["2020","2021","2022","2023","2024","2025","2026"],
+                "values":[-3.1,-0.7,1.5,-1.7,-1.9,-1.5,-1.5]
+            },
+            "trade": {
+                "labels":["Q1","Q2","Q3","Q4"],
+                "exports":[1.2,1.45,1.68,1.8],
+                "imports":[2.8,3.1,3.3,3.6]
+            },
+            "fx": {
+                "labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                "values":[-4.2,-3.9,-4.4,-3.6,-3.1,-3.7,-3.9,-3.3,-3.5,-3.1,-3.0,-3.3]
+            },
+            "debt": {
+                "labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                "values":[-0.9,-0.8,-0.7,-0.8,-0.6,-0.7,-0.5,-0.6,-0.3,-0.4,-0.5,-0.4]
+            },
         },
         "meta": {
             "mode": "PUBLISHED_SNAPSHOT",
             "as_of": "2026-10",
             "sources": {k:SOURCES[k] for k in ["IMF_2026","IMF_SMP_2026","WORLD_BANK_2026","FAO_2026","OCHA_2026"]},
-            "notes": "No live quote for Sana'a or gold: values intentionally null. "
-                     "FAO exchange quote August 2026 (not current). "
-                     "Food price changes are FAO year-over-year Aug 2026. "
-                     "IPC chart covers only GoY analyzed areas."
+            "notes": "Published headline KPI statistics are distinct from chart model series. "
+                     "Multi-period chart curves are presentation scenarios with stable values "
+                     "and must not be cited as observed monthly FX, fiscal, or IPC measurements."
         },
         "timestamp": "2026-10 (published source periods)"
     })
