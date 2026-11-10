@@ -788,7 +788,7 @@
 
             const latlngs = layer.getLatLngs();
             // Handle MultiPolygon and Holes (Flatten to array of rings)
-            const rings = layer instanceof L.MultiPolygon || Array.isArray(latlngs[0]) ?
+            const rings = ((typeof L.MultiPolygon === 'function') && (layer instanceof L.MultiPolygon)) || Array.isArray(latlngs[0]) ?
                 (Array.isArray(latlngs[0]) && !Array.isArray(latlngs[0][0]) ? [latlngs] : latlngs) :
                 [latlngs];
 
@@ -1106,8 +1106,12 @@
                 document.getElementById('sync-tag').innerText=source.toUpperCase()+' // '+observedAt+' UTC+03';
                 document.getElementById('sync-tag').style.color='';
                 if (!cities.some(c => c.location_id === selectedId)) selectedId=cities[0].location_id;
-                if (!map) await initMap();
-                else if (geoLayer) geoLayer.setStyle(feature => {
+                if (!map) {
+                    // Remote boundary GeoJSON should never block the KPI and chart rendering.
+                    initMap().then(() => {
+                        if (map && typeof L !== 'undefined') updateMarkers(lastData);
+                    }).catch(e=>console.warn('Map background load failed',e));
+                } else if (geoLayer) geoLayer.setStyle(feature => {
                     const name=feature.properties.shapeName, mapped=NAME_MAP[name]||name;
                     const city=cities.find(c=>c.city_name===mapped||normalizeName(c.city_name)===normalizeName(name));
                     const dark=document.documentElement.getAttribute('data-theme')==='dark';
@@ -1134,7 +1138,7 @@
                 if (geoLayer) geoLayer.setStyle({fillColor:'#94a3b8',fillOpacity:0.05});
                 if (windEngine) windEngine.update([]);
                 renderSidebar([]);
-                if (!map) await initMap();
+                if (!map) initMap().catch(e=>console.warn("Map unavailable",e));
             } finally { pendingUpdate=false; }
         }
 
@@ -1266,16 +1270,17 @@
             const historyNames = [...new Set(history.map(h => h.city_name))];
             const displayCities = historyNames.length > 0 ? historyNames.slice(0, 4) : current.slice(0, 4).map(c => c.city_name);
 
+            const hourLabels = history.filter(h => h.city_name === displayCities[0])
+                .slice(-7).map(h => h.observation_time.slice(11,16));
             const lineData = {
+                labels: hourLabels,
                 datasets: displayCities.map((name, i) => {
-                    const cityHistory = history.filter(h => h.city_name === name);
+                    const cityHistory = history.filter(h => h.city_name === name).slice(-7);
                     return {
                         label: name,
-                        data: cityHistory.map(h => ({ x: h.observation_time, y: h.temperature })),
+                        data: cityHistory.map(h => h.temperature),
                         borderColor: ['#0ff', '#f0f', '#0f0', '#ff0'][i],
-                        borderWidth: 2,
-                        pointRadius: 2,
-                        tension: 0.3,
+                        borderWidth: 2, pointRadius: 2, tension: 0.3,
                         showLine: cityHistory.length > 1
                     };
                 })
@@ -1284,10 +1289,7 @@
             draw('lineChart', 'line', lineData, {
                 scales: {
                     x: {
-                        type: 'time',
-                        time: { unit: 'hour', displayFormats: { hour: 'HH:mm' } },
-                        min: luxon.DateTime.now().minus({ hours: 3 }).toISO(),
-                        max: luxon.DateTime.now().toISO(),
+                        type: 'category',
                         grid: { color: gridColor },
                         ticks: { color: tickColor, font: { size: 9 } }
                     },

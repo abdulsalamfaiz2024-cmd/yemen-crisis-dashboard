@@ -46,7 +46,7 @@
  class CanvasChart {
   static defaults={color:'#64748b',borderColor:'#e2e8f0',font:{family:'Arial'}};
   constructor(el,config){
-   this.canvas=typeof el==='string'?document.getElementById(el):el;
+   this.canvas=typeof el==='string'?document.getElementById(el):(el&&el.canvas?el.canvas:el);
    if(!this.canvas)throw Error('Missing chart canvas');
    this.config=config;this.options=config.options||{};this.data=config.data||{};
    this._resize=()=>this.update();
