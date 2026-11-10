@@ -25,6 +25,15 @@ CITIES = [
     ("Al Mahrah", 16.2167, 52.1667),
 ]
 
+@app.after_request
+def avoid_stale_dashboard_html(response):
+    # Keep browser HTML fresh after switching from CARTO to OSM tiles.
+    # Do not disable third-party tile caching.
+    if response.mimetype == "text/html":
+        response.headers["Cache-Control"] = "no-store, max-age=0, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+    return response
+
 @app.route("/")
 def home():
     return send_from_directory(ROOT, "dashboard.html")

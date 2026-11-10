@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MACRO_ECONOMICS // STRATEGIC_FINANCE_GRID</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
@@ -542,10 +542,21 @@
 
             async function init() {
                 try {
-                    const res = await fetch('/api/economy');
+                    const res = await fetch('/api/economy', { cache: 'no-store' });
+                    if (!res.ok) throw new Error('Economy API HTTP ' + res.status);
                     const json = await res.json();
-                    if (json.status === 'success') render(json);
-                } catch (e) { console.error(e); }
+                    if (json.status !== 'success' || !json.market || !json.charts)
+                        throw new Error('Economy response incomplete');
+                    if (typeof Chart === 'undefined') throw new Error('Chart.js library unavailable');
+                    render(json);
+                } catch (e) {
+                    console.error('Economy dashboard error:', e);
+                    const badge = document.getElementById('sys-status');
+                    if (badge) {
+                        badge.textContent = 'DATA UNAVAILABLE';
+                        badge.title = String(e.message || e);
+                    }
+                }
             }
 
             function render(d) {
@@ -560,11 +571,11 @@
 
                 document.getElementById('val-gdp').innerText = "$" + mkt.gdp.value + " BN";
                 document.getElementById('val-inf').innerText = mkt.inflation.value + "%";
-                document.getElementById('val-gold').innerText = mkt.gold.current == null ? 'N/A' : '
+                document.getElementById('val-gold').innerText = mkt.gold.current == null ? 'N/A' : '$' + mkt.gold.current.toLocaleString();
 
                 const goldChg = document.getElementById('chg-gold');
                 goldChg.innerText = mkt.gold.change == null ? '' : (mkt.gold.change > 0 ? '+' : '') + mkt.gold.change + '%';
-                goldChg.style.color = mkt.gold.change > 0 ? 'var(--success)' : 'var(--danger)';
+                goldChg.style.color = mkt.gold.change == null ? 'var(--text-dim)' : (mkt.gold.change > 0 ? 'var(--success)' : 'var(--danger)');
 
                 document.getElementById('val-aden').innerText = mkt.yer_aden.current == null ? 'N/A' : mkt.yer_aden.current.toLocaleString();
                 document.getElementById('val-sanaa').innerText = mkt.yer_sanaa.current == null ? 'N/A' : mkt.yer_sanaa.current;
@@ -652,103 +663,7 @@
                 document.documentElement.setAttribute('data-theme', saved);
             })();
 
-            window.onload = () => { init(); setInterval(init, 60000); };
-        </script>
-</body>
-
-</html> + mkt.gold.current.toLocaleString();
-
-                const goldChg = document.getElementById('chg-gold');
-                goldChg.innerText = (mkt.gold.change > 0 ? "+" : "") + mkt.gold.change + "%";
-                goldChg.style.color = mkt.gold.change > 0 ? 'var(--success)' : 'var(--danger)';
-
-                document.getElementById('val-aden').innerText = mkt.yer_aden.current.toLocaleString();
-                document.getElementById('val-sanaa').innerText = mkt.yer_sanaa.current;
-
-                // Charts
-                drawChart('chart-div', 'line', {
-                    labels: ch.divergence.labels,
-                    datasets: [
-                        { label: 'Aden', data: ch.divergence.aden, borderColor: '#ef4444', borderWidth: 3, tension: 0.4, pointRadius: 0 },
-                        { label: 'Sana\'a', data: ch.divergence.sanaa, borderColor: '#3b82f6', borderWidth: 3, tension: 0.4, pointRadius: 0 }
-                    ]
-                });
-
-                drawChart('chart-food', 'line', {
-                    labels: ch.food.labels,
-                    datasets: [{
-                        label: 'Cost', data: ch.food.values,
-                        borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true, tension: 0.4, pointRadius: 0
-                    }]
-                });
-
-                drawChart('chart-pp', 'bar', {
-                    labels: ch.pp_history.labels,
-                    datasets: [{ label: 'Coverage %', data: ch.pp_history.values, backgroundColor: '#f59e0b', borderRadius: 4 }]
-                });
-
-                drawChart('chart-unemp', 'bar', {
-                    labels: ch.unemp.labels,
-                    datasets: [{ label: 'Rate %', data: ch.unemp.values, backgroundColor: '#ef4444', borderRadius: 4 }]
-                });
-
-                drawChart('chart-trade', 'bar', {
-                    labels: ch.trade.labels,
-                    datasets: [
-                        { label: 'Exp', data: ch.trade.exports, backgroundColor: '#10b981', borderRadius: 4 },
-                        { label: 'Imp', data: ch.trade.imports, backgroundColor: '#ef4444', borderRadius: 4 }
-                    ]
-                });
-
-                drawChart('chart-fx', 'line', {
-                    labels: ch.fx.labels,
-                    datasets: [{ label: 'Resv', data: ch.fx.values, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 0 }]
-                });
-
-                drawChart('chart-debt', 'line', {
-                    labels: ch.debt.labels,
-                    datasets: [{ label: 'Debt %', data: ch.debt.values, borderColor: '#b45309', backgroundColor: 'rgba(180, 83, 9, 0.1)', fill: true, tension: 0.4, pointRadius: 0 }]
-                });
-            }
-
-            function drawChart(id, type, data) {
-                const ctx = document.getElementById(id).getContext('2d');
-                if (charts[id]) charts[id].destroy();
-                charts[id] = new Chart(ctx, {
-                    type: type,
-                    data: data,
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: type === 'line' && data.datasets.length > 1 } },
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: { beginAtZero: false, grid: { borderDash: [5, 5] } }
-                        }
-                    }
-                });
-            }
-
-            function toggleDrawer() {
-                document.getElementById('drawer').classList.toggle('active');
-                document.getElementById('drawer-overlay').classList.toggle('active');
-            }
-
-            function toggleTheme() {
-                const html = document.documentElement;
-                const current = html.getAttribute('data-theme') || 'light';
-                const next = current === 'light' ? 'dark' : 'light';
-                html.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
-                location.reload(); // Refresh to update chart defaults easily
-            }
-
-            (function () {
-                const saved = localStorage.getItem('theme') || 'light';
-                document.documentElement.setAttribute('data-theme', saved);
-            })();
-
-            window.onload = () => { init(); setInterval(init, 60000); };
+            window.addEventListener('load', init);
         </script>
 </body>
 
