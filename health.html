@@ -676,31 +676,31 @@
 
             <!-- 2. CHOLERA -->
             <div class="card">
-                <div class="card-title">CHOLERA CASES (2024) <span class="live-indicator"></span></div>
+                <div class="card-title">SUSPECTED MEASLES (2026) <span class="live-indicator"></span></div>
                 <div class="metric-value" id="val-cholera" style="color:var(--warning)">--</div>
-                <div class="metric-sub">WHO EPIDEMIOLOGICAL UPDATE</div>
+                <div class="metric-sub">WHO 2026 · MORE THAN 18,000</div>
             </div>
 
             <!-- 3. MALNUTRITION -->
             <div class="card">
                 <div class="card-title">ACUTE MALNUTRITION <span class="live-indicator"></span></div>
                 <div class="metric-value" id="val-mal" style="color:var(--danger)">--</div>
-                <div class="metric-sub">CHILDREN UNDER 5 (EST)</div>
+                <div class="metric-sub">OCHA HNRP 2026 · ESTIMATE</div>
             </div>
 
             <!-- 4. FUNDING GAP -->
             <div class="card" style="border-color: var(--danger);">
-                <div class="card-title" style="color:var(--danger)">FUNDING GAP (HEALTH) <span
+                <div class="card-title" style="color:var(--danger)">UNFPA FUNDING GAP (MAR 2026) <span
                         class="live-indicator"></span></div>
                 <div class="metric-value" id="val-fund" style="color:var(--danger)">--</div>
-                <div class="metric-sub">REQ. FOR SUSTAINED RESPONSE</div>
+                <div class="metric-sub">UNFPA APPEAL ONLY · $71.9M</div>
             </div>
         </div>
 
         <!-- ROW 2: EXTENDED CHARTS (Facilities & Pressure) -->
         <div class="card lg-2" style="height: 340px;">
             <div class="card-title">
-                <span>HEALTH FACILITIES STATUS (Real-Time)</span>
+                <span>HEALTH FACILITY FUNCTIONALITY (WHO 2026, %)</span>
                 <span class="live-indicator"></span>
             </div>
             <div style="position: relative; flex: 1; min-height: 0;">
@@ -709,14 +709,14 @@
         </div>
 
         <div class="card lg-1">
-            <div class="card-title">HOSPITAL PRESSURE IDX <span class="live-indicator"></span></div>
+            <div class="card-title">HUMANITARIAN RESPONSE PLAN (2026) <span class="live-indicator"></span></div>
             <div id="pressure-container" style="margin-top: 20px;">
                 <!-- Populated by JS -->
             </div>
         </div>
 
         <div class="card lg-1">
-            <div class="card-title">AMBULANCE ACTIVITY <span class="live-indicator"></span></div>
+            <div class="card-title">PUBLISHED HEALTH REPORTS <span class="live-indicator"></span></div>
             <div style="margin-top: 10px; overflow-y:auto; max-height: 250px;">
                 <table class="amb-table">
                     <tbody id="amb-body">
@@ -740,7 +740,7 @@
         </div>
 
         <div class="card lg-2" style="height: 200px;">
-            <div class="card-title">IMMUNIZATION COVERAGE <span class="live-indicator"></span></div>
+            <div class="card-title">COMPLETE VACCINATION COVERAGE (2026) <span class="live-indicator"></span></div>
             <div style="position: relative; flex: 1; min-height: 0;">
                 <canvas id="chart-imm"></canvas>
             </div>
@@ -748,7 +748,7 @@
 
         <!-- ROW 4: FEED -->
         <div class="card feed-container">
-            <div class="feed-header">> BIO-SURVEILLANCE FEED // DECRYPTING...</div>
+            <div class="feed-header">> PUBLISHED HEALTH UPDATES // SOURCES</div>
             <div id="feed-content"></div>
         </div>
 
@@ -777,9 +777,9 @@
 
                     // A. Strategic Overview (Top Row)
                     document.getElementById('val-pop').innerText = pop.total.toLocaleString();
-                    document.getElementById('src-pop').innerText = "SOURCE: " + pop.source;
+                    document.getElementById('src-pop').innerText = "SOURCE: " + pop.source + " (" + pop.date + ")";
 
-                    document.getElementById('val-cholera').innerText = stats.cholera_cases.toLocaleString();
+                    document.getElementById('val-cholera').innerText = stats.measles_cases.toLocaleString() + '+';
                     document.getElementById('val-mal').innerText = "~" + (stats.malnutrition_cases / 1000000).toFixed(1) + "M";
                     document.getElementById('val-fund').innerText = stats.funding_gap;
 
@@ -796,17 +796,17 @@
                     if (d.who_life_expectancy) {
                         document.getElementById('val-life').innerText = parseFloat(d.who_life_expectancy.current).toFixed(1);
                     }
-                    if (d.who_under5_mortality) {
+                    if (d.who_under5_mortality?.current != null) {
                         document.getElementById('val-mort').innerText = parseFloat(d.who_under5_mortality.current).toFixed(1);
                     }
 
                     // F. Little Chart
-                    renderMiniChart('chart-imm', d.measles_immunization.history, 'Measles %');
+                    renderMiniChart('chart-imm', d.measles_immunization.history, 'Complete vaccination % (OCHA 2026)');
 
                     // Start Feed
                     startFeed(ex.reports);
 
-                    document.getElementById('system-status').innerText = "OFFICIAL DATA SYNCED";
+                    document.getElementById('system-status').innerText = "PUBLISHED DATA // SOURCE DATES VARY";
                     document.getElementById('system-status').style.color = "var(--success)";
                     document.getElementById('system-status').style.borderColor = "var(--success)";
                 }
@@ -839,9 +839,9 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Operational', data: active, backgroundColor: cPurple },
-                        { label: 'Partial', data: partial, backgroundColor: cIndigo },
-                        { label: 'Non-Func', data: closed, backgroundColor: cSky }
+                        { label: 'Fully functional %', data: active, backgroundColor: cPurple },
+                        { label: 'Partly functional %', data: partial, backgroundColor: cIndigo },
+                        { label: 'Not functional %', data: closed, backgroundColor: cSky }
                     ]
                 },
                 options: {
@@ -870,7 +870,7 @@
             const pReach = data.reached;
 
             const pctTarget = (pTarget / pNeed) * 100;
-            const pctReach = (pReach / pTarget) * 100; // Reach as % of Target
+            const hasReach = typeof pReach === 'number' && Number.isFinite(pReach); // Reached count unavailable
 
             container.innerHTML = `
                 <div style="display:flex; flex-direction:column; gap:15px; margin-top:10px;">
@@ -896,11 +896,11 @@
 
                     <div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:0.8rem; color:var(--text-dim);">REACHED (Q1)</span>
-                            <span style="font-weight:bold; color:var(--success);">${(pReach / 1000000).toFixed(1)}M</span>
+                            <span style="font-size:0.8rem; color:var(--text-dim);">REACHED / NOT VERIFIED</span>
+                            <span style="font-weight:bold; color:var(--success);">${hasReach ? (pReach/1000000).toFixed(1)+'M' : 'N/A'}</span>
                         </div>
                         <div style="width:100%; height:6px; background:var(--border); border-radius:3px;">
-                            <div style="width:${(pReach / pNeed) * 100}%; height:100%; background:var(--success); border-radius:3px;"></div>
+                            <div style="width:${hasReach ? (pReach/pNeed)*100 : 0}%; height:100%; background:var(--success); border-radius:3px;"></div>
                         </div>
                     </div>
                 </div>
@@ -942,7 +942,7 @@
                         borderColor: cSky,
                         borderWidth: 2,
                         tension: 0.4,
-                        pointRadius: 0
+                        pointRadius: 4
                     }]
                 },
                 options: {
@@ -976,10 +976,7 @@
                 idx++;
             }
 
-            setInterval(() => {
-                addFeedItem(reports[idx % reports.length]);
-                idx++;
-            }, 4000);
+            // Published reports are static; never replay old reports as live updates.
         }
 
         function addFeedItem(r) {

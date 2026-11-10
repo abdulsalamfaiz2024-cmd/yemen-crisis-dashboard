@@ -611,40 +611,40 @@
         <div class="hud-container">
             <div class="card hud-card" style="border-top: 3px solid var(--accent); position: relative;">
                 <div class="chart-signal" style="top:10px; right:12px; width:5px; height:5px;"></div>
-                <div class="card-header">OPERATIONAL SCHOOLS</div>
+                <div class="card-header">EDUCATION NEEDS (2026)</div>
                 <div class="metric-big" id="k-active">--</div>
-                <div class="metric-small">LIVE STATUS</div>
+                <div class="metric-small">OCHA · NATIONAL 2026</div>
             </div>
             <div class="card hud-card" style="border-top: 3px solid var(--info); position: relative;">
                 <div class="chart-signal info" style="top:10px; right:12px; width:5px; height:5px;"></div>
-                <div class="card-header">AVG ATTENDANCE (30D)</div>
+                <div class="card-header">CHILDREN OUT OF SCHOOL</div>
                 <div class="metric-big" id="k-att">--%</div>
-                <div class="metric-small">30-DAY TREND</div>
+                <div class="metric-small">UNICEF · NATIONAL 2026</div>
             </div>
             <div class="card hud-card" style="border-top: 3px solid var(--warning); position: relative;">
                 <div class="chart-signal warning" style="top:10px; right:12px; width:5px; height:5px;"></div>
-                <div class="card-header">STAFFING CAPACITY</div>
+                <div class="card-header">OUT OF SCHOOL IN SAMPLE</div>
                 <div class="metric-big" id="k-staff">--%</div>
-                <div class="metric-small"><span id="k-staff-sub">--</span> ONLINE</div>
+                <div class="metric-small"><span id="k-staff-sub">--</span> SURVEY REGION</div>
             </div>
             <div class="card hud-card" style="border-top: 3px solid var(--danger); position: relative;">
                 <div class="chart-signal danger" style="top:10px; right:12px; width:5px; height:5px;"></div>
-                <div class="card-header">SYSTEM RISK INDEX</div>
+                <div class="card-header">TARGETED CHILDREN (2026)</div>
                 <div class="metric-big" id="k-risk" style="color:var(--danger)">--</div>
-                <div class="metric-small">EARLY WARNING SCORE</div>
+                <div class="metric-small">OCHA EDUCATION SECTOR</div>
             </div>
         </div>
 
         <!-- ROW 2 & 3: STRATEGIC & SPATIAL -->
         <div class="card col-2 row-2" style="position: relative;">
             <div class="chart-signal" style="top:15px; right:15px;"></div>
-            <div class="card-header">SCHOOL STATUS LIVE MAP</div>
+            <div class="card-header">SURVEY AREAS — NOT SCHOOL LOCATIONS</div>
             <div id="map"></div>
         </div>
 
         <!-- Closure Drivers (Row 2 Right) -->
         <div class="card col-2">
-            <div class="card-header">CLOSURE DRIVERS</div>
+            <div class="card-header">EDUCATION TARGETING (M)</div>
             <div class="chart-container">
                 <div class="chart-signal danger"></div>
                 <canvas id="c5"></canvas>
@@ -653,7 +653,7 @@
 
         <!-- ROW 3 Right Half: Two Numerical Charts -->
         <div class="card metric-card-half">
-            <div class="card-header">TEACHING CAPACITY</div>
+            <div class="card-header">TARGETED VS NEED (M)</div>
             <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative;">
                 <div class="chart-signal info" style="top:0; right:0;"></div>
                 <div
@@ -666,25 +666,25 @@
                 </div>
                 <div
                     style="font-size:9px; color:var(--text-mud); margin-top:10px; font-weight: 600; text-align: center;">
-                    VAR: 50% SYSTEM GAP</div>
+                    OCHA 2026 · CHILDREN TARGETED</div>
             </div>
         </div>
 
         <div class="card metric-card-half">
-            <div class="card-header">PAYROLL STATUS</div>
+            <div class="card-header">SAVE THE CHILDREN · SAMPLE COUNTS</div>
             <div class="status-grid"
                 style="display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: center; position: relative;">
                 <div class="chart-signal warning" style="top:0; right:0;"></div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.65rem; color: var(--text-mud); font-weight: 600;">PAID</span>
+                    <span style="font-size: 0.65rem; color: var(--text-mud); font-weight: 600;">CHILDREN</span>
                     <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent);" id="sal-paid">--%</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.65rem; color: var(--text-mud); font-weight: 600;">DELAYED</span>
+                    <span style="font-size: 0.65rem; color: var(--text-mud); font-weight: 600;">NEVER ENROLLED</span>
                     <span style="font-size: 0.9rem; font-weight: 700; color: var(--warning);" id="sal-del">--%</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.65rem; color: var(--text-mud); font-weight: 600;">UNPAID</span>
+                    <span style="font-size: 0.65rem; color: var(--text-mud); font-weight: 600;">DROPPED OUT</span>
                     <span style="font-size: 0.9rem; font-weight: 700; color: var(--danger);" id="sal-unp">--%</span>
                 </div>
             </div>
@@ -692,7 +692,7 @@
 
         <!-- ROW 4: Dropout Risk (Wide) -->
         <div class="card col-4">
-            <div class="card-header">SYSTEMIC DROPOUT RISK INDEX</div>
+            <div class="card-header">OUT-OF-SCHOOL RATE — SURVEY ONLY</div>
             <div
                 style="flex:1; display:flex; align-items:center; justify-content:space-around; gap: 20px; position: relative; flex-wrap: wrap; padding: 10px 0;">
                 <div class="chart-signal danger" style="top:0; right:0;"></div>
@@ -705,14 +705,13 @@
                 <div style="width: 1px; height: 60px; background: var(--panel-border);" class="hide-mobile"></div>
                 <div
                     style="max-width: 500px; font-size: 0.85rem; color: var(--text-mud); line-height: 1.5; flex: 1; min-width: 250px;">
-                    <b style="color: var(--danger);">ALERT:</b> System-wide dropout risk has exceeded the 2025 stability
-                    threshold. Primary drivers include fuel scarcity and regional displacement in central zones.
+                    <b style="color: var(--danger);">ALERT:</b> 63% of the 4,933 children assessed in Aden, Lahj and Taiz were out of school. This survey result must not be presented as a national attendance rate.
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: center; width: 100%;" class="hide-mobile">
                     <div
                         style="padding: 15px; border-radius: 12px; border: 1px solid var(--panel-border); background: var(--glow-accent); text-align: center;">
-                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--danger);">+12%</div>
-                        <div style="font-size: 0.6rem; color: var(--text-mud);">MoM DELTA</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--danger);">4,933</div>
+                        <div style="font-size: 0.6rem; color: var(--text-mud);">SAMPLED CHILDREN</div>
                     </div>
                 </div>
             </div>
@@ -720,7 +719,7 @@
 
         <!-- ROW 5: LINE CHARTS -->
         <div class="card chart-card">
-            <div class="card-header">ACTIVE SCHOOLS TREND</div>
+            <div class="card-header">NATIONAL EDUCATION NEEDS (M, 2026)</div>
             <div class="chart-container">
                 <div class="chart-signal"></div>
                 <canvas id="c1"></canvas>
@@ -728,7 +727,7 @@
         </div>
 
         <div class="card col-2 chart-card">
-            <div class="card-header">ATTENDANCE VS ABSENCE</div>
+            <div class="card-header">SCHOOL PARTICIPATION IN SAMPLE (%)</div>
             <div class="chart-container">
                 <div class="chart-signal info"></div>
                 <canvas id="c3"></canvas>
@@ -736,7 +735,7 @@
         </div>
 
         <div class="card chart-card">
-            <div class="card-header">SCHOOLS CLOSED (ROLLING)</div>
+            <div class="card-header">EDUCATION EXCLUSION — SAMPLE COUNTS</div>
             <div class="chart-container">
                 <div class="chart-signal danger"></div>
                 <canvas id="c4"></canvas>
@@ -745,7 +744,7 @@
 
         <!-- NEW: LATEST FIELD REPORTS -->
         <div class="card col-4" style="background: rgba(5, 150, 105, 0.03);">
-            <div class="card-header" style="color: var(--accent);">LATEST SECTOR REPORTS (FIELD_INTEL)</div>
+            <div class="card-header" style="color: var(--accent);">PUBLISHED EDUCATION SOURCES (2026)</div>
             <div id="edu-reports-list"
                 style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px;">
                 <!-- Populated by JS -->
@@ -763,13 +762,10 @@
 
         // Init Map
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const map = L.map('map', { attributionControl: false }).setView([15.3694, 44.1910], 6);
-        const tileLayer = isDark
-            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-            : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-
-        L.tileLayer(tileLayer, {
-            maxZoom: 19
+        const map = L.map('map', { attributionControl: true }).setView([15.3694,44.1910],6);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom:19,
+            attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
         }).addTo(map);
 
         // Global Chart Registry
@@ -784,7 +780,7 @@
                     window.latestReports = json.reports;
                     renderCharts(json.nrt);
                     document.getElementById('loader').style.display = 'none';
-                    document.getElementById('status-line').innerText = "LIVE STREAM: " + json.meta.timestamp;
+                    document.getElementById('status-line').innerText = "PUBLISHED FIGURES (2026): " + json.meta.timestamp;
                     document.getElementById('status-line').style.color = "var(--accent)";
                 }
             } catch (e) { console.error(e); }
@@ -796,95 +792,82 @@
         }
 
         function renderCharts(d) {
-            // Chart Defaults
-            const theme = document.documentElement.getAttribute('data-theme') || 'light';
-            const color = theme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
-            const border = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+            // Same original card/grid layout and Chart.js canvases, sourced 2026 statistics.
+            const theme=document.documentElement.getAttribute('data-theme')||'light';
+            const color=theme==='dark'?'rgba(255,255,255,0.7)':'rgba(0,0,0,0.65)';
+            Chart.defaults.color=color;
+            Chart.defaults.font.family="'Inter', sans-serif";
+            document.getElementById('k-active').innerText=(d.active_schools.current/1e6).toFixed(1)+'M';
+            document.getElementById('k-att').innerText=(d.active_schools.history_7d[1]/1e6).toFixed(1)+'M';
+            document.getElementById('k-staff').innerText=d.dropout_risk.value+'%';
+            document.getElementById('k-staff-sub').innerText='ADEN / LAHJ / TAIZ';
+            document.getElementById('k-risk').innerText=(d.teachers_stat.present/1e6).toFixed(1)+'M';
 
-            Chart.defaults.color = color;
-            Chart.defaults.borderColor = border;
-            Chart.defaults.font.family = "'Inter', sans-serif";
-
-            // --- 0. POPULATE HUD CARDS ---
-            document.getElementById('k-active').innerText = d.active_schools.current.toLocaleString();
-
-            const avgAtt = d.attendance_rate.values.reduce((a, b) => a + b, 0) / d.attendance_rate.values.length;
-            document.getElementById('k-att').innerText = avgAtt.toFixed(1) + "%";
-
-            const staffPct = (d.teachers_stat.present / d.teachers_stat.expected) * 100;
-            document.getElementById('k-staff').innerText = staffPct.toFixed(1) + "%";
-            document.getElementById('k-staff-sub').innerText = (d.teachers_stat.present / 1000).toFixed(1) + "K";
-
-            document.getElementById('k-risk').innerText = d.dropout_risk.value;
-
-
-            // 1. Active Schools (Sparkline)
             createChart('c1', {
-                type: 'line',
-                data: { labels: [1, 2, 3, 4, 5, 6, 7], datasets: [{ data: d.active_schools.history_7d, borderColor: '#00ffa3', borderWidth: 2, tension: 0.4, pointRadius: 0 }] },
-                options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, maintainAspectRatio: false }
+                type:'bar', data:{
+                    labels:['Need education aid','Out of school','Targeted children'],
+                    datasets:[{label:'Million children',data:d.active_schools.history_7d.map(v=>v/1e6),
+                        backgroundColor:['#00ffa3','#ffb800','#00d1ff'],borderRadius:5}]
+                }, options:{indexAxis:'y',plugins:{legend:{display:false}},
+                    scales:{x:{beginAtZero:true},y:{grid:{display:false}}},
+                    maintainAspectRatio:false}
             });
-
-            // 2. Attendance vs Absence (c3)
             createChart('c3', {
-                type: 'line',
-                data: {
-                    labels: d.attendance_vs_absence.dates,
-                    datasets: [
-                        { label: 'Present', data: d.attendance_vs_absence.present, borderColor: 'transparent', backgroundColor: 'rgba(0, 250, 150, 0.4)', fill: true, borderWidth: 0, tension: 0.4 },
-                        { label: 'Absent', data: d.attendance_vs_absence.absent, borderColor: 'transparent', backgroundColor: 'rgba(255, 50, 100, 0.4)', fill: true, borderWidth: 0, tension: 0.4 }
-                    ]
-                },
-                options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { stacked: true, max: 100, display: false } }, elements: { point: { radius: 0 } }, maintainAspectRatio: false }
+                type:'bar', data:{
+                    labels:['Aden/Lahj/Taiz survey 2026'],
+                    datasets:[
+                        {label:'Not out of school',data:d.attendance_vs_absence.present,
+                            backgroundColor:'rgba(0,250,150,0.7)'},
+                        {label:'Out of school',data:d.attendance_vs_absence.absent,
+                            backgroundColor:'rgba(255,50,100,0.7)'}
+                    ]}, options:{indexAxis:'y',
+                    plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:10}}},
+                    scales:{x:{stacked:true,min:0,max:100,title:{display:true,text:'% in survey sample'}},
+                            y:{stacked:true,grid:{display:false}}},maintainAspectRatio:false}
             });
-
-            // 3. Closed Schools (c4)
             createChart('c4', {
-                type: 'line',
-                data: { labels: d.schools_closed.dates, datasets: [{ label: 'Closed', data: d.schools_closed.count, borderColor: '#ff3366', backgroundColor: 'rgba(255, 51, 102, 0.1)', fill: true, borderWidth: 2, tension: 0.4, pointRadius: 0 }] },
-                options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } }, maintainAspectRatio: false }
+                type:'bar',data:{
+                    labels:d.schools_closed.dates,
+                    datasets:[{label:'Surveyed children',data:d.schools_closed.count,
+                        backgroundColor:['#ff3366','#ffb800'],borderRadius:5}]
+                },options:{indexAxis:'y',plugins:{legend:{display:false}},
+                    scales:{x:{beginAtZero:true},y:{grid:{display:false}}},maintainAspectRatio:false}
             });
-
-            // 4. Closure Drivers (c5)
             createChart('c5', {
-                type: 'bar',
-                data: { labels: d.closure_reasons.labels, datasets: [{ data: d.closure_reasons.values, backgroundColor: ['#ff3366', '#ffb800', '#00ffa3', '#00d1ff', '#94a3b8'], borderRadius: 6, barThickness: 8 }] },
-                options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false } } }, maintainAspectRatio: false }
+                type:'bar',data:{
+                    labels:d.closure_reasons.labels,
+                    datasets:[{label:'Million children',data:d.closure_reasons.values,
+                        backgroundColor:['#00ffa3','#ff3366'],borderRadius:6,barThickness:13}]
+                },options:{indexAxis:'y',plugins:{legend:{display:false}},
+                    scales:{x:{beginAtZero:true},y:{grid:{display:false}}},maintainAspectRatio:false}
             });
-
-            // 5. Teachers Stat (DOM)
-            document.getElementById('val-teach-pres').innerText = (d.teachers_stat.present / 1000).toFixed(1) + "K";
-            document.getElementById('val-teach-exp').innerText = (d.teachers_stat.expected / 1000).toFixed(1) + "K";
-            document.getElementById('bar-teach').style.width = ((d.teachers_stat.present / d.teachers_stat.expected) * 100) + "%";
-
-            // 6. Salary Status (DOM)
-            document.getElementById('sal-paid').innerText = d.salary_status.paid + "%";
-            document.getElementById('sal-del').innerText = d.salary_status.delayed + "%";
-            document.getElementById('sal-unp').innerText = d.salary_status.unpaid + "%";
-
-            // 7. Dropout Risk (DOM)
-            document.getElementById('val-risk').innerText = d.dropout_risk.value;
-            document.getElementById('val-risk').style.color = d.dropout_risk.value > 70 ? '#ff3366' : '#ffb800';
-            document.getElementById('lbl-risk').innerText = d.dropout_risk.level;
-
-            // 8. Map Markers
-            d.school_map.forEach(p => {
-                const color = p.status === 'Open' ? '#00ffa3' : (p.status === 'Closed' ? '#ff3366' : '#ffb800');
-                L.circleMarker([p.lat, p.lon], { radius: 6, weight: 2, color: color, fillColor: color, fillOpacity: 0.4 }).addTo(map)
-                    .bindPopup(`<b>${p.name}</b><br>Status: ${p.status}`);
+            const target=d.teachers_stat.present,need=d.teachers_stat.expected;
+            document.getElementById('val-teach-pres').innerText=(target/1e6).toFixed(1)+'M targeted';
+            document.getElementById('val-teach-exp').innerText=(need/1e6).toFixed(1)+'M need';
+            document.getElementById('bar-teach').style.width=(target/need*100).toFixed(1)+'%';
+            document.getElementById('sal-paid').innerText=d.salary_status.paid.toLocaleString();
+            document.getElementById('sal-del').innerText=d.salary_status.delayed.toLocaleString();
+            document.getElementById('sal-unp').innerText=d.salary_status.unpaid.toLocaleString();
+            document.getElementById('val-risk').innerText=d.dropout_risk.value+'%';
+            document.getElementById('val-risk').style.color='#ffb800';
+            document.getElementById('lbl-risk').innerText='SAVE THE CHILDREN · 2026';
+            d.school_map.forEach(p=>{
+                L.circleMarker([p.lat,p.lon],{radius:6,weight:2,color:'#00d1ff',
+                    fillColor:'#00d1ff',fillOpacity:0.4}).addTo(map)
+                    .bindPopup(p.name+' — one of three surveyed governorates, not a school status.');
             });
-
-            // 9. EDU REPORTS
-            const reportList = document.getElementById('edu-reports-list');
-            if (reportList && window.latestReports) {
-                reportList.innerHTML = '';
-                window.latestReports.forEach(r => {
-                    reportList.innerHTML += `
-                        <div style="padding:10px; border-left: 2px solid var(--accent); background: var(--panel);">
-                            <div style="font-size: 0.6rem; color: var(--text-mud); font-weight: 800;">${r.date}</div>
-                            <div style="font-size: 0.75rem; font-weight: 600; margin-top: 3px; color: var(--text-main);">${r.title}</div>
-                        </div>
-                    `;
+            const list=document.getElementById('edu-reports-list');
+            if(list&&window.latestReports){
+                list.replaceChildren();
+                window.latestReports.forEach(r=>{
+                    const box=document.createElement('div');
+                    box.style.cssText='padding:10px;border-left:2px solid var(--accent);background:var(--panel)';
+                    const stamp=document.createElement('div');stamp.style.cssText='font-size:.65rem;color:var(--text-mud)';
+                    stamp.textContent=r.date;
+                    const link=document.createElement('a');link.href=r.url||'#';link.target='_blank';
+                    link.rel='noopener noreferrer';link.textContent=r.title;
+                    link.style.cssText='display:block;font-size:.76rem;font-weight:600;color:var(--text-main);margin-top:3px;text-decoration:underline';
+                    box.append(stamp,link);list.appendChild(box);
                 });
             }
         }

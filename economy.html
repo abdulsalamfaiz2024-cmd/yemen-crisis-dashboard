@@ -422,7 +422,7 @@
             <div class="logo">FINANCE_SYNDROME // <span style="color:var(--info)">ECONOMIC_GRID</span></div>
         </div>
         <div style="display: flex; align-items: center; gap: 15px;">
-            <div class="status-badge" id="sys-status">CONNECTED_TO_REALTIME_FEED</div>
+            <div class="status-badge" id="sys-status">PUBLISHED 2026 DATA / NOT LIVE FX</div>
             <button onclick="toggleTheme()"
                 style="background:var(--text-main); color:var(--panel); border:none; padding:7px 14px; border-radius:8px; cursor:pointer; font-size:0.7rem; font-weight:800;">THEME</button>
         </div>
@@ -449,23 +449,23 @@
         <div class="card hud-card gdp">
             <div class="card-header">NOMINAL GDP <span class="live-dot"></span></div>
             <div class="metric-big" id="val-gdp">--</div>
-            <div class="metric-label">EST. ANNUALIZED ($BN)</div>
+            <div class="metric-label">IMF WEO · 2026 PROJECTION ($BN)</div>
         </div>
 
         <div class="card hud-card inf">
             <div class="card-header">INFLATION <span class="live-dot"></span></div>
             <div class="metric-big" id="val-inf" style="color:var(--danger)">--</div>
-            <div class="metric-label">CONSUMER PRICE INDEX</div>
+            <div class="metric-label">IMF WEO 2026 · FORECAST</div>
         </div>
 
         <div class="card hud-card gold">
-            <div class="card-header">XAU / GOLD <span class="live-dot"></span></div>
+            <div class="card-header">GOLD PRICE (UNVERIFIED) <span class="live-dot"></span></div>
             <div class="metric-big" id="val-gold">--</div>
-            <div class="metric-label"><span id="chg-gold">--%</span> MARKET DELTA</div>
+            <div class="metric-label"><span id="chg-gold">--%</span> NO VERIFIED LIVE QUOTE</div>
         </div>
 
         <div class="card hud-card fx">
-            <div class="card-header">YER EXCHANGE <span class="live-dot"></span></div>
+            <div class="card-header">YER / USD · AUG 2026 FAO <span class="live-dot"></span></div>
             <div class="exchange-grid">
                 <div class="exchange-item" style="border-right: 1px solid var(--panel-border);">
                     <div class="exchange-val" id="val-aden">--</div>
@@ -480,59 +480,59 @@
 
         <!-- MAIN CHARTS -->
         <div class="card col-span-2 row-span-2">
-            <div class="card-header">EXCHANGE DIVERGENCE INDEX <span class="live-dot"></span></div>
+            <div class="card-header">FX REFERENCE — GoY AUG 2026 <span class="live-dot"></span></div>
             <div class="chart-container"><canvas id="chart-div"></canvas></div>
         </div>
 
         <div class="card col-span-2">
-            <div class="card-header">MINIMUM FOOD BASKET COST <span class="live-dot"></span></div>
+            <div class="card-header">FOOD PRICE CHANGE (YoY, AUG 2026, %) <span class="live-dot"></span></div>
             <div class="chart-container"><canvas id="chart-food"></canvas></div>
         </div>
 
         <div class="card metric-half">
-            <div class="card-header">PURCHASING POWER <span class="live-dot"></span></div>
-            <div class="metric-label">SALARY COVERAGE %</div>
+            <div class="card-header">2026 HUMANITARIAN RESPONSE FUNDING <span class="live-dot"></span></div>
+            <div class="metric-label">REQUIRED / PRIORITY ($BN)</div>
             <div class="chart-container" style="min-height: 180px;"><canvas id="chart-pp"></canvas></div>
         </div>
 
         <div class="card metric-half">
-            <div class="card-header">UNEMPLOYMENT <span class="live-dot"></span></div>
-            <div class="metric-label">LABOR FORCE %</div>
+            <div class="card-header">REAL GDP GROWTH <span class="live-dot"></span></div>
+            <div class="metric-label">2025 EST. / 2026 PROJECTION (%)</div>
             <div class="chart-container" style="min-height: 180px;"><canvas id="chart-unemp"></canvas></div>
         </div>
 
         <!-- MACRO INDICATORS -->
         <div class="card col-span-2">
-            <div class="card-header">FX RESERVES <span class="live-dot"></span></div>
-            <div class="metric-label">IMPORT COVER ($BN)</div>
+            <div class="card-header">CURRENT ACCOUNT BALANCE <span class="live-dot"></span></div>
+            <div class="metric-label">IMF 2026 FORECAST (% OF GDP)</div>
             <div class="chart-container"><canvas id="chart-fx"></canvas></div>
         </div>
 
         <div class="card">
-            <div class="card-header">TRADE BALANCE <span class="live-dot"></span></div>
-            <div class="metric-label">EXP vs IMP ($BN)</div>
+            <div class="card-header">ACUTE FOOD INSECURITY · GoY <span class="live-dot"></span></div>
+            <div class="metric-label">IPC 3+ · OCT–DEC 2026 (M PEOPLE)</div>
             <div class="chart-container"><canvas id="chart-trade"></canvas></div>
         </div>
 
         <div class="card">
-            <div class="card-header">PUBLIC DEBT <span class="live-dot"></span></div>
-            <div class="metric-label">RATIO TO GDP %</div>
+            <div class="card-header">FISCAL BALANCE <span class="live-dot"></span></div>
+            <div class="metric-label">IMF 2026 FORECAST (% GDP)</div>
             <div class="chart-container"><canvas id="chart-debt"></canvas></div>
         </div>
 
         <!-- SUMMARY -->
         <div class="summary-banner">
             <div style="font-weight: 800; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;">
-                2025_SYNOPSIS</div>
+                2026_PUBLISHED_SOURCE_NOTES</div>
             <div style="display: flex; gap: 40px; flex: 1; flex-wrap: wrap;">
                 <div style="font-size: 0.85rem; color: var(--text-dim); flex: 1; min-width: 200px;">
-                    <b style="color:var(--text-main)">FX STABILITY:</b> Aden/Sana'a gap at record spread.
+                    <b style="color:var(--text-main)">FX REFERENCE:</b> FAO August 2026 GoY: YER 1,555/USD; no verified Sana'a quote.
                 </div>
                 <div style="font-size: 0.85rem; color: var(--text-dim); flex: 1; min-width: 200px;">
-                    <b style="color:var(--text-main)">DEBT LOAD:</b> Surged to 84% GDP.
+                    <b style="color:var(--text-main)">IMF:</b> 2026 GDP forecast -1.5%; fiscal balance -0.4% of GDP.
                 </div>
                 <div style="font-size: 0.85rem; color: var(--text-dim); flex: 1; min-width: 200px;">
-                    <b style="color:var(--text-main)">POWER:</b> Salaries cover <45% of food costs. </div>
+                    <b style="color:var(--text-main)">FAO:</b> IPC estimate is for GoY-controlled areas only. <a href="https://www.fao.org/giews/countrybrief/country.jsp?code=YE" target="_blank" rel="noopener" style="color:var(--info)">Source</a>. </div>
                 </div>
             </div>
         </div>
@@ -560,7 +560,103 @@
 
                 document.getElementById('val-gdp').innerText = "$" + mkt.gdp.value + " BN";
                 document.getElementById('val-inf').innerText = mkt.inflation.value + "%";
-                document.getElementById('val-gold').innerText = "$" + mkt.gold.current.toLocaleString();
+                document.getElementById('val-gold').innerText = mkt.gold.current == null ? 'N/A' : '
+
+                const goldChg = document.getElementById('chg-gold');
+                goldChg.innerText = mkt.gold.change == null ? '' : (mkt.gold.change > 0 ? '+' : '') + mkt.gold.change + '%';
+                goldChg.style.color = mkt.gold.change > 0 ? 'var(--success)' : 'var(--danger)';
+
+                document.getElementById('val-aden').innerText = mkt.yer_aden.current == null ? 'N/A' : mkt.yer_aden.current.toLocaleString();
+                document.getElementById('val-sanaa').innerText = mkt.yer_sanaa.current == null ? 'N/A' : mkt.yer_sanaa.current;
+
+                // Every chart is a snapshot with a documented unit and scope (not a simulated live market).
+                drawChart('chart-div','line',{
+                    labels:ch.divergence.labels,
+                    datasets:[
+                      {label:'Aden / GoY (FAO Aug 2026)',data:ch.divergence.aden,
+                        borderColor:'#ef4444',borderWidth:3,pointRadius:6,showLine:false},
+                      {label:"Sana'a / no verified quote",data:ch.divergence.sanaa,
+                        borderColor:'#3b82f6',pointRadius:6,showLine:false}
+                    ]});
+                drawChart('chart-food','bar',{
+                    labels:ch.food.labels,
+                    datasets:[{label:'Annual price change %',data:ch.food.values,
+                        backgroundColor:'#10b981',borderRadius:5}]
+                });
+                drawChart('chart-pp','bar',{
+                    labels:ch.pp_history.labels,
+                    datasets:[{label:'USD billion · 2026 HNRP',data:ch.pp_history.values,
+                        backgroundColor:'#f59e0b',borderRadius:4}]
+                });
+                drawChart('chart-unemp','bar',{
+                    labels:ch.unemp.labels,
+                    datasets:[{label:'Real GDP growth %',data:ch.unemp.values,
+                        backgroundColor:'#ef4444',borderRadius:4}]
+                });
+                drawChart('chart-trade','bar',{
+                    labels:ch.trade.labels,
+                    datasets:[
+                        {label:'IPC Phase 4 emergency (M)',data:ch.trade.exports,
+                            backgroundColor:'#ef4444',borderRadius:4},
+                        {label:'Other IPC Phase 3+ (M)',data:ch.trade.imports,
+                            backgroundColor:'#f59e0b',borderRadius:4}
+                    ]
+                });
+                drawChart('chart-fx','line',{
+                    labels:ch.fx.labels,
+                    datasets:[{label:'Current account balance % GDP',data:ch.fx.values,
+                        borderColor:'#3b82f6',pointRadius:6,showLine:false}]
+                });
+                drawChart('chart-debt','line',{
+                    labels:ch.debt.labels,
+                    datasets:[{label:'Government balance % GDP',data:ch.debt.values,
+                        borderColor:'#b45309',pointRadius:6,showLine:false}]
+                });
+                const badge=document.getElementById('sys-status');
+                if(badge)badge.textContent='SOURCE PERIOD: 2025–2026 · NOT REALTIME';
+            }
+
+            function drawChart(id, type, data) {
+                const ctx = document.getElementById(id).getContext('2d');
+                if (charts[id]) charts[id].destroy();
+                charts[id] = new Chart(ctx, {
+                    type: type,
+                    data: data,
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: type === 'line' && data.datasets.length > 1 } },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { beginAtZero: false, grid: { borderDash: [5, 5] } }
+                        }
+                    }
+                });
+            }
+
+            function toggleDrawer() {
+                document.getElementById('drawer').classList.toggle('active');
+                document.getElementById('drawer-overlay').classList.toggle('active');
+            }
+
+            function toggleTheme() {
+                const html = document.documentElement;
+                const current = html.getAttribute('data-theme') || 'light';
+                const next = current === 'light' ? 'dark' : 'light';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                location.reload(); // Refresh to update chart defaults easily
+            }
+
+            (function () {
+                const saved = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', saved);
+            })();
+
+            window.onload = () => { init(); setInterval(init, 60000); };
+        </script>
+</body>
+
+</html> + mkt.gold.current.toLocaleString();
 
                 const goldChg = document.getElementById('chg-gold');
                 goldChg.innerText = (mkt.gold.change > 0 ? "+" : "") + mkt.gold.change + "%";
